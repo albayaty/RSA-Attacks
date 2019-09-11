@@ -1,5 +1,5 @@
 /* ==============================================
-*  Copyright ©  2014  Ali M. Al-Bayaty
+*  Copyright Â©  2014  Ali M. Al-Bayaty
 *  
 *  RSA Attacks is free software: you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
@@ -38,9 +38,12 @@ e and n are public keys,
 C is the ciphertext, and 
 M is the output plaintext.
 
-Attack 1: Factors n to recover the primes (p and q), such that [n = p*q]. Then, calculates the private keys (d and n), and then calculates [M = C^d*mod(n)]. Using the naive and inefficient methods for factoring (n), for finding (d) from (e) and Ø(n), and for modular exponentiation.
+Attack 1: Factors n to recover the primes (p and q), such that [n = p*q]. Then, calculates the private keys (d and n), and then 
+calculates [M = C^d*mod(n)]. Using the naive and inefficient methods for factoring (n), for finding (d) from (e) and Ã˜(n), and 
+for modular exponentiation.
 
-Attack 2: Generates all possible values of (M) until finds one for which [M^e = C*mod(n)]. Using the naive and inefficient method for modular exponentiation.
+Attack 2: Generates all possible values of (M) until finds one for which [M^e = C*mod(n)]. Using the naive and inefficient method 
+for modular exponentiation.
 # ------------------------------------------------------------------
 
 sage: # Setting the initial values:
