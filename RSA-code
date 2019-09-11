@@ -1,0 +1,211 @@
+/* ==============================================
+*  Copyright ©  2014  Ali M. Al-Bayaty
+*  
+*  RSA Attacks is free software: you can redistribute it and/or modify
+*  it under the terms of the GNU General Public License as published by
+*  the Free Software Foundation, either version 3 of the License, or
+*  any later version.
+*  
+*  RSA Attacks is distributed in the hope that it will be useful,
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*  GNU General Public License for more details.
+*  
+*  You should have received a copy of the GNU General Public License
+*  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+/* ==============================================
+*  
+*  RSA Attacks
+*  
+*  MSEE Student: Ali M. Al-Bayaty
+*  Instructor: Dr. James Marcus
+*  CS 634: Cryptography and Data Security
+*  Personal Website: <http://albayaty.github.io/>
+*
+*  ==============================================
+*/
+
+# ------------------------------------------------------------------
+The main program:
+
+The implementation of this RSA code uses Sage with the reference of "Cryptography and Network Security" (5th Ed), William Stallings.
+
+Date: May 18, 2012
+
+Where:
+e and n are public keys,
+C is the ciphertext, and 
+M is the output plaintext.
+
+Attack 1: Factors n to recover the primes (p and q), such that [n = p*q]. Then, calculates the private keys (d and n), and then calculates [M = C^d*mod(n)]. Using the naive and inefficient methods for factoring (n), for finding (d) from (e) and Ø(n), and for modular exponentiation.
+
+Attack 2: Generates all possible values of (M) until finds one for which [M^e = C*mod(n)]. Using the naive and inefficient method for modular exponentiation.
+# ------------------------------------------------------------------
+
+sage: # Setting the initial values:
+sage: n = matrix([15, 527, 1537]);
+sage: e = matrix([7, 13, 19]);
+sage: C = matrix([4, 232, 1000]);
+
+sage: # Performing the Attacks:
+sage: for i in range(0,3):
+		if i == 0:
+			print "Part A:";
+		elif i == 1:
+			print "Part B:";
+		else:
+			print "Part C:";
+
+      print "RSA Attack 1:";
+      RSA_Attack1(n[0,i], e[0,i], C[0,i]);
+      print " ";
+      print "RSA Attack 2:";
+      RSA_Attack2(n[0,i], e[0,i], C[0,i]);
+      print "-------------------------------------------------------";
+      print " ";
+
+sage: # RSA Attack 1 Function ...
+sage: def RSA_Attack1(n, e, C):
+		# Getting the start times:
+		start1 = cputime();
+		start2 = walltime();
+
+      #Factorizing n into p and q:
+      #p, q = prime_divisors(n);
+      found = False;
+      for p in range(2,n):
+        # Testing for p is prime or not:
+        if( not is_prime(p) ):
+            continue;
+        for q in range(2,n):
+            # Testing for q is prime or not:
+            if( not is_prime(q) ):
+                continue;
+            # Comparing the found p and q with n, exit the inner loop:
+            if( p*q == n ):
+                found = True;
+                break;
+        # p and q are found, exit the other loop:
+        if( found ):
+            break;
+
+      # Euler's Totient Function of n:
+      #phi1 = euler_phi(n);
+      phi1 = (p-1)*(q-1);
+
+      # The inverse of the encryption key in the phi(n):
+      #d = inverse_mod(e, phi1);
+      d = 1;
+      while(True):
+        if( (d*e)%phi1 == 1 ):
+            break;
+        d = d + 1;
+    
+      # Getting the message by decrypting the ciphertext
+      # The FOR loop is used to prevent the overflow when 
+      # multiply and modulus:
+      #M = (C^d)%n;
+      M = 1;
+      for i in range(d):
+        M = (M * C)%n;
+    
+      # Getting the stop times:
+      stop1 = cputime();
+      stop2 = walltime();
+      time1 = stop1 - start1;
+      time2 = stop2 - start2;
+
+      #print "The composite number, n = ", n;
+      print "The 1st prime number of n, p = ", p;
+      print "The 2nd prime number of n, q = ", q;
+      print "The Euler's Totient of n, phi(n) = ", phi1;
+      #print "The Encryption key, e = ", e;
+      print "The Decryption key, d = ", d;
+      print "The Message, M = ", M;
+      print "The running time (CPU clock) = ", time1, " sec";
+      print "The running time (WALL clock)= ", time2, " sec";
+
+sage: # RSA Attack 2 Function ...
+sage: def RSA_Attack2(n, e, C):
+      # Getting the start times:
+      start1 = cputime();
+      start2 = walltime();
+
+      # Getting the message by (M^e) = C*mod(n):
+      M = 0;
+      Mi= 1;   # Temp storage for M
+      while(True):
+        # The FOR loop is used to prevent the 
+        # overflow when multiply and modulus:
+        for count in range(e):
+            Mi = (Mi * M)%n;
+        # When found, exit the loop:
+        if( Mi == C ):
+            break;
+        # Increment M by 1, and continue:
+        M = M + 1;
+        Mi= 1;
+
+      # Getting the stop times:
+      stop1 = cputime();
+      stop2 = walltime();
+      time1 = stop1 - start1;
+      time2 = stop2 - start2;
+
+      #print "The composite number, n = ", n;
+      #print "The Encryption key, e = ", e;
+      print "The Message, M = ", M;
+      print "The running time (CPU clock) = ", time1, " sec";
+      print "The running time (WALL clock)= ", time2, " sec";
+
+# ------------------------------------------------------------------
+# Output:
+# ------------------------------------------------------------------
+Part A:
+RSA Attack 1:
+The 1st prime number of n, p =  3
+The 2nd prime number of n, q =  5
+The Euler's Totient of n, phi(n) =  8
+The Decryption key, d =  7
+The Message, M =  4
+The running time (CPU clock) =  0.001999  sec
+The running time (WALL clock)=  0.00175809860229  sec
+ 
+RSA Attack 2:
+The Message, M =  4
+The running time (CPU clock) =  0.0  sec
+The running time (WALL clock)=  9.51290130615e-05  sec
+-------------------------------------------------------
+ 
+Part B:
+RSA Attack 1:
+The 1st prime number of n, p =  17
+The 2nd prime number of n, q =  31
+The Euler's Totient of n, phi(n) =  480
+The Decryption key, d =  37
+The Message, M =  333
+The running time (CPU clock) =  0.075989  sec
+The running time (WALL clock)=  0.111933946609  sec
+ 
+RSA Attack 2:
+The Message, M =  333
+The running time (CPU clock) =  0.002  sec
+The running time (WALL clock)=  0.00247001647949  sec
+-------------------------------------------------------
+ 
+Part C:
+RSA Attack 1:
+The 1st prime number of n, p =  29
+The 2nd prime number of n, q =  53
+The Euler's Totient of n, phi(n) =  1456
+The Decryption key, d =  843
+The Message, M =  1497
+The running time (CPU clock) =  0.302953  sec
+The running time (WALL clock)=  0.387131929398  sec
+ 
+RSA Attack 2:
+The Message, M =  1497
+The running time (CPU clock) =  0.009999  sec
+The running time (WALL clock)=  0.0158531665802  sec
+-------------------------------------------------------
